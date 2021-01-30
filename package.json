@@ -1,14 +1,23 @@
 {
-  "name": "bilibili-helper",
+  "name": "bilibili-live-maid",
   "version": "0.1.0",
   "private": true,
+  "main": "electron/main.js",
   "scripts": {
+    "proxy": "export ELECTRON_CUSTOM_DIR=\"11.2.1\" && export ELECTRON_MIRROR=\"https://npm.taobao.org/mirrors/electron/\"",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "dev:electron": "electron .",
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "dependencies": {
+    "bilibili-live": "^2.1.0",
     "core-js": "^3.8.1",
+    "electron-squirrel-startup": "^1.0.0",
+    "normalize.css": "^8.0.1",
     "vue": "^3.0.4",
     "vue-class-component": "^8.0.0-0",
     "vue-router": "^4.0.1",
@@ -26,18 +35,51 @@
     "@vue/compiler-sfc": "^3.0.4",
     "@vue/eslint-config-airbnb": "^5.3.0",
     "@vue/eslint-config-typescript": "^7.0.0",
+    "electron": "^11.2.1",
     "eslint": "^7.15.0",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-vue": "^7.2.0",
     "lint-staged": "^10.5.3",
     "stylus": "^0.54.8",
     "stylus-loader": "^4.3.1",
-    "typescript": "~4.1.2"
+    "typescript": "~4.1.2",
+    "@electron-forge/cli": "^6.0.0-beta.54",
+    "@electron-forge/maker-deb": "^6.0.0-beta.54",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.54",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.54",
+    "@electron-forge/maker-zip": "^6.0.0-beta.54"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
   },
   "lint-staged": {
     "*.{js,jsx,vue,ts,tsx}": "vue-cli-service lint"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "my_app"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
   }
 }

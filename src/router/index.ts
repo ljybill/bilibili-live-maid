@@ -1,11 +1,12 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import Home from '../views/Home.vue';
+import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
+// import Home from '../views/Home.vue';
+import DanmuList from '../views/danmu/List.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Home',
-    component: Home,
+    component: DanmuList,
   },
   {
     path: '/about',
@@ -15,10 +16,16 @@ const routes: Array<RouteRecordRaw> = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue'),
   },
+  {
+    path: '/danmu',
+    name: 'Danmu',
+    component: DanmuList,
+  },
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  // history: createWebHistory(process.env.BASE_URL),
+  history: createWebHashHistory(),
   routes,
 });
 
