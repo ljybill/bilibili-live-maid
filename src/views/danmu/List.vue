@@ -30,13 +30,13 @@ body
     overflow auto
 </style>
 <template>
-  <div class="online">人气：{{online}}</div>
+  <div class="online">人气：{{ online }}</div>
   <div class="list">
     <div id="abc" class="a">
-      <MessageItem v-for="(item, index) in joinList" :key="'join - ' + index" :message="item"/>
+      <MessageItem v-for="(item) in joinList" :key="'join - ' + item.timeStamp" :message="item"/>
     </div>
     <div id="cba" class="b">
-      <MessageItem v-for="(item, index) in messageList" :key="'msg -' + index" :message="item"/>
+      <MessageItem v-for="(item) in messageList" :key="'msg -' + item.timeStamp" :message="item"/>
     </div>
   </div>
 </template>
@@ -48,11 +48,15 @@ import {
 } from 'vue';
 import MessageItem from './Item.vue';
 
-interface IMessage {
-  type: 'msg' | 'join'; // 消息类型
-  nickname: string; // 用户昵称
-  content?: string; // 消息内容
-}
+// interface IMessage {
+//   type: 'msg' | 'join'; // 消息类型
+//   nickname: string; // 用户昵称
+//   content?: string; // 消息内容
+// }
+
+const MESSAGE_TYPE_DANMU = 'danmu'; // 弹幕消息
+const MESSAGE_TYPE_JOIN = 'join'; // 进场消息
+const MESSAGE_TYPE_GIFT = 'gift'; // 礼物消息
 
 export default defineComponent({
   name: 'danmu_list',
@@ -62,28 +66,21 @@ export default defineComponent({
   },
   data() {
     return {
-      messageList: [] as Array<IMessage>,
-      joinList: [] as Array<IMessage>,
+      messageList: [] as Array<any>,
+      joinList: [] as Array<any>,
       online: 0,
     };
   },
   watch: {},
   methods: {
     listenMainProcessMessage() {
-      window.ipcRenderer.on('user_join', (evt: any, msg: any) => {
-        this.joinList.push({
-          type: 'join',
-          nickname: msg.nickname,
-        });
+      window.ipcRenderer.on(MESSAGE_TYPE_JOIN, (evt: any, messageData: any) => {
+        this.joinList.push(messageData);
         this.scrollToBottom('#abc');
       });
 
-      window.ipcRenderer.on('danmu_message', (evt: any, msg: any) => {
-        this.messageList.push({
-          type: 'msg',
-          nickname: msg.nickname,
-          content: msg.message,
-        });
+      window.ipcRenderer.on(MESSAGE_TYPE_DANMU, (evt: any, messageData: any) => {
+        this.messageList.push(messageData);
         this.scrollToBottom('#cba');
       });
 

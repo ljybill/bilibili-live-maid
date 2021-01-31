@@ -6,80 +6,52 @@ const {
 const { DanmakuService } = require('bilibili-live');
 const EventEmitter = require('events');
 const path = require('path');
+const danmakuService = require('./service/danmakuService');
+const { messageEventEmitter } = require('./service/globalEventBus');
+const Constants = require('./constants');
+const MessageModel = require('./model/MessageModel');
 
 // var list
 let online = 0;
-const eventEmitter = new EventEmitter();
-const danmakuClient = new DanmakuService({
-  roomId: 9167635
-});
+const roomId = 9167635;
 
-danmakuClient.connect();
-danmakuClient
-  .on('open', () => {
-    console.log('正在连接至弹幕服务器...');
-    eventEmitter.emit('open');
-  })
-  .on('data', (msg) => {
-    eventEmitter.emit('data', msg);
-  })
-  .on('close', () => {
-    console.log('已断开与弹幕服务器的连接');
-    eventEmitter.emit('close');
-  })
-  .on('error', () => {
-    console.log('与弹幕服务器的连接出现错误');
-    eventEmitter.emit('error');
-  });
-
-function invokeMessageFromMain(win) {
-  if (!win || !win.webContents) {
-    return;
-  }
-  eventEmitter.removeAllListeners();
-  eventEmitter.on('data', (msg) => {
-    console.log(msg);
+function bindEventEmitter(eventEmitter, win) {
+  eventEmitter.on(Constants.DANMU_DATA, (msg) => {
     // 通过不同的msg，进行不同的事件上报
     if (msg.op === 'SEND_SMS_REPLY') {
-      if (msg.cmd === 'INTERACT_WORD') {
-        // 进入直播间
-        win.webContents.send('user_join', {
-          nickname: msg.data.uname,
-        });
-      }
-
-      if (msg.cmd === 'DANMU_MSG') {
-        try {
-          // 弹幕消息
-          const data = {
-            nickname: msg.info[2][1],
-            message: msg.info[1]
-          };
-          win.webContents.send('danmu_message', data);
-        } catch (e) {
-          console.error(e);
-        }
-      }
-    }
-    if (msg.op === 'HEARTBEAT_REPLY') {
+      const message = new MessageModel(msg);
+      console.log('send a event, type is:', message.type);
+      win.webContents.send(message.type, message.toData());
+    } else if (msg.op === 'HEARTBEAT_REPLY') {
       // 心跳包
       if (online !== msg.online) {
         // 直播间人气发生变化
         online = msg.online;
         win.webContents.send('online_changed', online);
-
-        // win.webContents.send('user_join', {
-        //   nickname: '随机名字' + Math.random(),
-        // });
       }
+    } else {
+      // 未处理消息
+      console.log('未处理消息:', msg);
     }
   });
+}
+
+function invokeMessageFromMain(win) {
+  if (!win || !win.webContents) {
+    return;
+  }
+  // 连接弹幕服务器
+  danmakuService.createClient(roomId);
+  // 清掉之前的事件绑定，如果存在的话
+  messageEventEmitter.removeAllListeners();
+  // 绑定弹幕服务器消息事件
+  bindEventEmitter(messageEventEmitter, win);
 }
 
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 360,
+    width: 800,
     height: 600,
     titleBarStyle: 'hidden',
     transparent: true,
@@ -89,21 +61,27 @@ function createWindow() {
   });
 
   // and load the index.html of the app.
-  // mainWindow.loadURL('http://127.0.0.1:8080');
-  mainWindow.loadFile(
-    path.resolve(__dirname, '../', 'dist/index.html'),
-    {
-      protocol: 'file:',
-      slashes: true,
-    },
-  );
-  mainWindow.setAlwaysOnTop(true);
+  // dev mode
+  mainWindow.loadURL('http://127.0.0.1:8080');
+
+  // build mode
+  // mainWindow.loadFile(
+  //   path.resolve(__dirname, '../', 'dist/index.html'),
+  //   {
+  //     protocol: 'file:',
+  //     slashes: true,
+  //   },
+  // );
+
+  // build mode
+  // mainWindow.setAlwaysOnTop(true);
 
   mainWindow.webContents.on('did-finish-load', () => {
     invokeMessageFromMain(mainWindow);
   });
   mainWindow.on('close', () => {
-    eventEmitter.removeAllListeners();
+    // 窗口关闭后去掉所有的监听事件，因为在窗口再次打开时会重新绑定事件
+    messageEventEmitter.removeAllListeners();
   });
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
