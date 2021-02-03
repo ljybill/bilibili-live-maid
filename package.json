@@ -2,22 +2,24 @@
   "name": "bilibili-live-maid",
   "version": "0.1.0",
   "private": true,
-  "main": "electron/main.js",
   "scripts": {
     "proxy": "export ELECTRON_CUSTOM_DIR=\"11.2.1\" && export ELECTRON_MIRROR=\"https://npm.taobao.org/mirrors/electron/\"",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "dev:electron": "electron .",
+    "dev:electron": "electron src/electron/main.ts",
     "start": "electron-forge start",
     "package": "electron-forge package",
-    "make": "electron-forge make"
+    "make": "electron-forge make",
+    "dev:el": "webpack --config config/webpack.config.js"
   },
   "dependencies": {
     "bilibili-live": "^2.1.0",
     "core-js": "^3.8.1",
     "crypto-js": "^4.0.0",
+    "electron": "^11.2.1",
     "electron-squirrel-startup": "^1.0.0",
+    "lodash-es": "^4.17.20",
     "log4node": "^0.1.6",
     "normalize.css": "^8.0.1",
     "vue": "^3.0.4",
@@ -27,6 +29,12 @@
     "ws": "^7.4.2"
   },
   "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.54",
+    "@electron-forge/maker-deb": "^6.0.0-beta.54",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.54",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.54",
+    "@electron-forge/maker-zip": "^6.0.0-beta.54",
+    "@types/lodash": "^4.14.168",
     "@typescript-eslint/eslint-plugin": "^4.9.1",
     "@typescript-eslint/parser": "^4.9.1",
     "@vue/cli-plugin-babel": "~5.0.0-alpha.3",
@@ -38,19 +46,18 @@
     "@vue/compiler-sfc": "^3.0.4",
     "@vue/eslint-config-airbnb": "^5.3.0",
     "@vue/eslint-config-typescript": "^7.0.0",
-    "electron": "^11.2.1",
+    "cross-spawn": "^7.0.3",
     "eslint": "^7.15.0",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-vue": "^7.2.0",
     "lint-staged": "^10.5.3",
     "stylus": "^0.54.8",
     "stylus-loader": "^4.3.1",
+    "ts-loader": "^8.0.14",
     "typescript": "~4.1.2",
-    "@electron-forge/cli": "^6.0.0-beta.54",
-    "@electron-forge/maker-deb": "^6.0.0-beta.54",
-    "@electron-forge/maker-rpm": "^6.0.0-beta.54",
-    "@electron-forge/maker-squirrel": "^6.0.0-beta.54",
-    "@electron-forge/maker-zip": "^6.0.0-beta.54"
+    "webpack": "^5.19.0",
+    "webpack-cli": "^4.4.0",
+    "webpack-dev-server": "^3.11.2"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"

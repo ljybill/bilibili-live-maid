@@ -2,7 +2,7 @@
 node_modules
 /dist
 /out
-/ttt
+/dist-electron
 
 # local env files
 .env.local

@@ -1,11 +1,26 @@
-const { unix2normal } = require('../utils/index');
-const MESSAGE_TYPE_DANMU = 'danmu'; // 弹幕消息
-const MESSAGE_TYPE_JOIN = 'join'; // 进场消息
-const MESSAGE_TYPE_GIFT = 'gift'; // 礼物消息
-const MESSAGE_TYPE_OTHER = 'other'; // 其他消息
+import { MESSAGE_TYPE_DANMU, MESSAGE_TYPE_JOIN, MESSAGE_TYPE_OTHER } from '@/shared/constants';
+import { unix2normal } from '../utils';
 
 class MessageModel {
-  constructor(data) {
+  type: string;
+
+  nickname: string;
+
+  private userId: string;
+
+  private content: string;
+
+  private userLevel: number;
+
+  private userColor: string | undefined;
+
+  private timeStamp: number;
+
+  private hasFansMedal: boolean;
+
+  private fansMedal: {};
+
+  constructor(data: any) {
     this.type = MESSAGE_TYPE_OTHER;
     this.nickname = '';
     this.userId = '';
@@ -18,10 +33,10 @@ class MessageModel {
     // TODO: 之后再整理粉丝牌子的数据
     this.fansMedal = {};
 
-    this._parse(data);
+    this.parse(data);
   }
 
-  _parse(data) {
+  private parse(data: any) {
     if (data.op === 'SEND_SMS_REPLY') {
       switch (data.cmd) {
         case 'INTERACT_WORD': {
@@ -38,9 +53,13 @@ class MessageModel {
           this.type = MESSAGE_TYPE_DANMU;
           try {
             // 因为是B站数据，所以结构不是自己能控制的。
+            // eslint-disable-next-line prefer-destructuring
             this.nickname = data.info[2][1];
+            // eslint-disable-next-line prefer-destructuring
             this.content = data.info[1];
+            // eslint-disable-next-line prefer-destructuring
             this.userId = data.info[2][0];
+            // eslint-disable-next-line prefer-destructuring
             this.userLevel = data.info[4][0];
             this.timeStamp = unix2normal(data.info[9].ts);
           } catch (e) {
@@ -52,7 +71,7 @@ class MessageModel {
         case 'NOTICE_MSG': {
           if (/快来围观吧/.test(data.msg_self)) {
             // 其他房间的礼物消息，过滤掉
-          } else if (/开通了/.test(data.msg_self) && data.roomid !== 9167635/*currentRoomId*/) {
+          } else if (/开通了/.test(data.msg_self) && data.roomid !== 9167635) {
             // 其他房间有人上船
           } else {
             console.error('未定义行为!', data);
@@ -66,7 +85,7 @@ class MessageModel {
     }
   }
 
-  toData() {
+  public toData(): any {
     if (this.type === MESSAGE_TYPE_DANMU) {
       return {
         type: this.type,
@@ -87,7 +106,8 @@ class MessageModel {
         hasFansMedal: this.hasFansMedal,
       };
     }
+    return {};
   }
 }
 
-module.exports = MessageModel;
+export default MessageModel;

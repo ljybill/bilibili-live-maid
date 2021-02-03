@@ -16,7 +16,8 @@
       "webpack-env"
     ],
     "typeRoots": [
-      "node_modules"
+      "node_modules",
+      "./types"
     ],
     "paths": {
       "@/*": [
