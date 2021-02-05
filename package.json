@@ -7,11 +7,10 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "dev:electron": "electron src/electron/main.ts",
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "dev:el": "webpack --config config/webpack.config.js"
+    "dev:electron": "webpack --config config/webpack.config.electron.js"
   },
   "dependencies": {
     "bilibili-live": "^2.1.0",
