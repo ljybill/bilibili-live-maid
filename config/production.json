@@ -1,0 +1,5 @@
+{
+  "env": "production",
+  "isDev": false,
+  "danmakuPath": "dist/"
+}

@@ -7,14 +7,12 @@ export function onConnect() {
 }
 
 export function onMessage(ctx: ICtx, msg: any) {
-  console.log(ctx.eventName);
   const message = new MessageModel(msg);
   assert(ctx.windowsMap.has('main'), '找不到main窗口');
-  console.log(typeof ctx.windowsMap.get('main')?.webContents.send);
   (ctx.windowsMap.get('main') as Electron.BrowserWindow)
     .webContents
     .send(message.type, message.toData());
-  console.log('我收到了消息 onMessage', message);
+  console.log('我收到了消息 onMessage', message.type);
 }
 
 export function onDisConnect() {

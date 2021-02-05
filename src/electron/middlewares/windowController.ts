@@ -1,4 +1,5 @@
 import path from 'path';
+import config from 'config';
 import { ICtx } from '@/electron/types';
 import { BrowserWindow } from 'electron';
 
@@ -16,7 +17,16 @@ export async function createMainWindow(ctx: ICtx) {
     });
 
     ctx.setWindow('main', mainWindow);
-    await mainWindow.loadFile(path.resolve(__dirname, '../dist', 'index.html'));
+
+    if (config.get('isDev')) {
+      await mainWindow.loadURL(config.get('danmakuPath'));
+    } else {
+      await mainWindow.loadFile(path.resolve(__dirname, '../dist', config.get('danmakuPath')));
+    }
+
+    if (config.get('isDev')) {
+      mainWindow.webContents.openDevTools();
+    }
   } catch (e) {
     // TODO: logger
     console.error(e);

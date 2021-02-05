@@ -1,7 +1,7 @@
 const path = require('path');
 const spawn = require('cross-spawn');
 
-const outPath = path.resolve(__dirname, '../', 'dist-electron');
+const outPath = path.resolve(__dirname, 'dist-electron');
 
 class InvokeElectronWebpackPlugin {
   constructor() {
@@ -41,7 +41,7 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
     alias: {
-      '@': path.resolve(__dirname, '../src'),
+      '@': path.resolve(__dirname, 'src'),
     },
   },
   module: {

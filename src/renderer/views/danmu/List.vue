@@ -84,6 +84,10 @@ export default defineComponent({
         this.scrollToBottom('#cba');
       });
 
+      window.ipcRenderer.on('other', () => {
+        console.log('other');
+      });
+
       window.ipcRenderer.on('online_changed', (evt: any, online: number) => {
         // 直播间人气发生变化
         this.online = online;
