@@ -1,42 +1,83 @@
 <style lang="stylus" scoped>
 .container
   height 100%
-  background darkcyan
   box-sizing border-box
   overflow hidden
+  display flex
+  flex-direction column
 
 header
   padding 12px 6px
   display flex
   justify-content space-between
+  align-items center
+  border-bottom 1px solid red
+  flex none
 
 nav
   flex none
+  box-sizing border-box
+  padding 12px 6px
+  transition all 0.3s
+
+  &.hide
+    visibility hidden
+    width 0
+    padding 12px 0
+    font-size 0
 
 main
+  flex 1
+  height calc(100% - 51px)
   display flex
 
 .content
   flex 1
+  // 因为 header 高度51px
+  height 100%
   padding-left 6px
+  overflow-y auto
+
+.fan-medal
+  background-color darkred
 </style>
 
 <template>
   <div class="container">
     <header>
-      <div>收起</div>
-      <div>人气: {{ online }}</div>
+      <div>
+        <i
+          @click="isShowNav = !isShowNav"
+          class="icon-btn"
+          :class="isShowNav ? 'icon-expand' : 'icon-collapse'"
+        />
+      </div>
+      <div>人气: <span class="rainbow">{{ online }}</span></div>
     </header>
     <main>
-      <nav>
-        <div>
-          <p>1a2b</p>
-          <p>1a2b</p>
-        </div>
+      <nav :class="{'hide': !isShowNav}">
+        <i class="icon-btn icon-game"></i>
       </nav>
       <div class="content">
         <div v-for="item in msgList" :key="item.timeStamp">
-          <p v-if="item.type === MESSAGE_TYPE_DANMU"></p>
+          <p v-if="item.type === MESSAGE_TYPE_DANMU">
+            <span
+              v-if="item.fansMedalName"
+              class="fan-medal">
+              Lv{{ item.fansMedalLevel }} {{ item.fansMedalName }}
+            </span>
+            <b>{{ item.nickname }}</b>
+            <span>说：{{ item.content }}</span>
+          </p>
+          <p v-else-if="item.type === MESSAGE_TYPE_JOIN">
+            <span
+              v-if="item.fansMedalName"
+              class="fan-medal">
+              Lv{{ item.fansMedalLevel }} {{ item.fansMedalName }}
+            </span>
+            <b>{{ item.nickname }}</b>
+            <span style="font-size: 0.8em;">进入了直播间，欢迎</span>
+          </p>
         </div>
       </div>
     </main>
@@ -52,7 +93,8 @@ export default defineComponent({
   data() {
     return {
       msgList: [] as Array<any>,
-      online: 0,
+      online: 0 as number,
+      isShowNav: true as boolean,
     };
   },
   methods: {
@@ -65,16 +107,25 @@ export default defineComponent({
       window.ipcRenderer.on(MESSAGE_TYPE_DANMU, (evt: any, messageData: any) => {
         console.log(messageData);
         this.msgList.push(messageData);
+
+        this.scrollBoxToBottom('main > .content');
       });
 
       window.ipcRenderer.on('online_changed', (evt: any, online: number) => {
         // 直播间人气发生变化
         this.online = online;
       });
+    },
 
-      window.ipcRenderer.on('other', () => {
-        console.log('other');
-      });
+    scrollBoxToBottom(selector: string) {
+      setTimeout(() => {
+        document.querySelector(selector)
+          ?.scrollTo({
+            top: 999999,
+            left: 0,
+            behavior: 'smooth',
+          });
+      }, 20);
     },
   },
 
@@ -84,6 +135,7 @@ export default defineComponent({
   setup() {
     return {
       MESSAGE_TYPE_DANMU,
+      MESSAGE_TYPE_JOIN,
     };
   },
 });

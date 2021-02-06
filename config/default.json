@@ -2,5 +2,5 @@
   "env": "development",
   "isDev": true,
   "danmakuPath": "http://127.0.0.1:8080/danmaku.html",
-  "defaultRoomId": 7618517
+  "defaultRoomId": 22381172
 }

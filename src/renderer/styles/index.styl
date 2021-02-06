@@ -1,4 +1,5 @@
 @import "~../../../node_modules/normalize.css/normalize.css";
+@import "icon.styl";
 
 html, body, #app
   height 100%
@@ -8,4 +9,32 @@ body
   font-family Avenir, Helvetica, Arial, sans-serif
   -webkit-font-smoothing antialiased
   -moz-osx-font-smoothing grayscale
+  font-size 16px
 
+p
+  margin-block-start 0.5em
+  margin-block-end 0.5em
+  line-height 1.35
+
+.icon-btn
+  border-radius 90%
+  overflow hidden
+
+  &:hover
+    background-color aquamarine
+
+@keyframes bgp {
+  0% {
+    background-position 0 0
+  }
+  100% {
+    background-position -100% 0
+  }
+}
+
+.rainbow
+  background-image linear-gradient(to right, red, orange, brown, green, brown, orange, red, orange, brown, green, brown, orange, red)
+  background-clip text
+  -webkit-text-fill-color transparent
+  background-size 200% 100%
+  animation bgp 8s infinite linear
