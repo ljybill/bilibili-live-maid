@@ -5,7 +5,7 @@ import Events from 'events';
 import {
   DANMU_CONNECT, DANMU_DATA, DANMU_DISCONNECT, DANMU_ERROR,
 } from './constants';
-import { createMainWindow } from './middlewares/windowController';
+import { changeWindowPinStatus, createMainWindow } from './middlewares/windowController';
 import { createBilibiliClient } from './middlewares/bilibiliClient';
 import {
   onConnect, onMessage, onDisConnect, onError,
@@ -122,6 +122,7 @@ class MyApp {
       customEventEmitter: this.customEventEmitter,
     };
 
+    this.listenIpc();
     this.mountElectronApp();
   }
 
@@ -150,6 +151,12 @@ class MyApp {
           handler(this.ctx, ...args);
         }
       });
+    });
+  }
+
+  private listenIpc() {
+    Electron.ipcMain.on('change_window_pin', (event, args) => {
+      this.customEventEmitter.emit('change_window_pin', args);
     });
   }
 
@@ -208,3 +215,4 @@ myapp.use('custom', DANMU_CONNECT, onConnect);
 myapp.use('custom', DANMU_DATA, onMessage);
 myapp.use('custom', DANMU_ERROR, onError);
 myapp.use('custom', DANMU_DISCONNECT, onDisConnect);
+myapp.use('custom', 'change_window_pin', changeWindowPinStatus);

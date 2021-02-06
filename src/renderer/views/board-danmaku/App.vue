@@ -7,7 +7,7 @@
   flex-direction column
 
 header
-  padding 12px 6px
+  padding 26px 6px 6px
   display flex
   justify-content space-between
   align-items center
@@ -19,6 +19,11 @@ nav
   box-sizing border-box
   padding 12px 6px
   transition all 0.3s
+  display flex
+  flex-direction column
+
+  & > i
+    margin-bottom 10px
 
   &.hide
     visibility hidden
@@ -28,7 +33,7 @@ nav
 
 main
   flex 1
-  height calc(100% - 51px)
+  height calc(100% - 59px)
   display flex
 
 .content
@@ -57,6 +62,10 @@ main
     <main>
       <nav :class="{'hide': !isShowNav}">
         <i class="icon-btn icon-game"></i>
+        <i
+          @click="isPin = !isPin"
+          class="icon-btn" :class="isPin ? 'icon-pin' : 'icon-pin-outline'"
+        />
       </nav>
       <div class="content">
         <div v-for="item in msgList" :key="item.timeStamp">
@@ -95,17 +104,16 @@ export default defineComponent({
       msgList: [] as Array<any>,
       online: 0 as number,
       isShowNav: true as boolean,
+      isPin: true as boolean,
     };
   },
   methods: {
     listenMainProcessMessage() {
       window.ipcRenderer.on(MESSAGE_TYPE_JOIN, (evt: any, messageData: any) => {
-        console.log(messageData);
         this.msgList.push(messageData);
       });
 
       window.ipcRenderer.on(MESSAGE_TYPE_DANMU, (evt: any, messageData: any) => {
-        console.log(messageData);
         this.msgList.push(messageData);
 
         this.scrollBoxToBottom('main > .content');
@@ -127,10 +135,20 @@ export default defineComponent({
           });
       }, 20);
     },
+
+    sendMessageToWindow() {
+      window.ipcRenderer.send('change_window_pin', this.isPin);
+    },
+  },
+  watch: {
+    isPin() {
+      this.sendMessageToWindow();
+    },
   },
 
   mounted() {
     this.listenMainProcessMessage();
+    this.sendMessageToWindow();
   },
   setup() {
     return {
