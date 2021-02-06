@@ -2,3 +2,4 @@
 /dist-electron
 
 webpack.config.*
+public/*.js

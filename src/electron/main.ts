@@ -2,6 +2,8 @@ import * as Electron from 'electron';
 import { ICtx } from '@/electron/types';
 import assert from 'assert';
 import Events from 'events';
+import { onTTSAvailable } from '@/electron/middlewares/voice';
+import { getToken } from '@/electron/services/baiduYunService';
 import {
   DANMU_CONNECT, DANMU_DATA, DANMU_DISCONNECT, DANMU_ERROR,
 } from './constants';
@@ -122,8 +124,16 @@ class MyApp {
       customEventEmitter: this.customEventEmitter,
     };
 
-    this.listenIpc();
+    getToken()
+      .then((token) => {
+        this.ctx.ttsToken = token;
+        this.customEventEmitter.emit('getTTSToken', token);
+      })
+      .catch((e: Error) => {
+        console.error(e);
+      });
     this.mountElectronApp();
+    this.listenIpc();
   }
 
   private setWindow(name: string, window: Electron.BrowserWindow) {
@@ -174,6 +184,8 @@ class MyApp {
         }
       });
     });
+
+    this.electronApp.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
   }
 
   /**
@@ -216,3 +228,4 @@ myapp.use('custom', DANMU_DATA, onMessage);
 myapp.use('custom', DANMU_ERROR, onError);
 myapp.use('custom', DANMU_DISCONNECT, onDisConnect);
 myapp.use('custom', 'change_window_pin', changeWindowPinStatus);
+myapp.use('custom', 'getTTSToken', onTTSAvailable);

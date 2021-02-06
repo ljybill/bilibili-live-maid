@@ -9,4 +9,5 @@ export interface ICtx {
   setWindow: (name: string, window: Electron.BrowserWindow) => void;
   removeWindow: (name: string) => void;
   customEventEmitter: Events.EventEmitter;
+  ttsToken?: string;
 }

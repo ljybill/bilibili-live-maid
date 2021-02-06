@@ -9,5 +9,6 @@ createApp(App)
 declare global {
   interface Window {
     ipcRenderer: IpcRenderer;
+    btts: any;
   }
 }

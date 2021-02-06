@@ -1,5 +1,7 @@
 <style lang="stylus" scoped>
 .container
+  background-color rgba(0, 0, 0, .4)
+  color aliceblue
   height 100%
   box-sizing border-box
   overflow hidden
@@ -44,7 +46,8 @@ main
   overflow-y auto
 
 .fan-medal
-  background-color darkred
+  background-color #CC6600
+  margin-right 0.4em
 </style>
 
 <template>
@@ -94,7 +97,7 @@ main
 </template>
 
 <script lang="ts">
-import { MESSAGE_TYPE_DANMU, MESSAGE_TYPE_JOIN } from '@/shared/constants';
+import { MESSAGE_TYPE_DANMU, MESSAGE_TYPE_JOIN, UPDATE_TTS_TOKEN } from '@/shared/constants';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -104,13 +107,16 @@ export default defineComponent({
       msgList: [] as Array<any>,
       online: 0 as number,
       isShowNav: true as boolean,
-      isPin: true as boolean,
+      isPin: false as boolean,
+      token: '' as string,
     };
   },
   methods: {
     listenMainProcessMessage() {
       window.ipcRenderer.on(MESSAGE_TYPE_JOIN, (evt: any, messageData: any) => {
         this.msgList.push(messageData);
+
+        this.speak(`欢迎 ${messageData.nickname} 进入直播间`);
       });
 
       window.ipcRenderer.on(MESSAGE_TYPE_DANMU, (evt: any, messageData: any) => {
@@ -123,6 +129,11 @@ export default defineComponent({
         // 直播间人气发生变化
         this.online = online;
       });
+
+      window.ipcRenderer.on(UPDATE_TTS_TOKEN, (evt: any, token: string) => {
+        localStorage.setItem('token', token);
+        this.token = token;
+      });
     },
 
     scrollBoxToBottom(selector: string) {
@@ -131,13 +142,33 @@ export default defineComponent({
           ?.scrollTo({
             top: 999999,
             left: 0,
-            behavior: 'smooth',
           });
-      }, 20);
+      }, 100);
     },
 
     sendMessageToWindow() {
       window.ipcRenderer.send('change_window_pin', this.isPin);
+    },
+
+    speak(text: string) {
+      if (!text) {
+        return;
+      }
+      window.btts({
+        tex: text,
+        tok: this.token,
+        cuid: 'www.ljybill.com',
+        spd: 5,
+        pit: 5,
+        vol: 15,
+        per: 4,
+      }, {
+        volume: 0.5,
+        autoDestory: true,
+        timeout: 10000,
+        hidden: true,
+        autoplay: true,
+      });
     },
   },
   watch: {
@@ -149,6 +180,7 @@ export default defineComponent({
   mounted() {
     this.listenMainProcessMessage();
     this.sendMessageToWindow();
+    this.token = localStorage.getItem('token') || '';
   },
   setup() {
     return {

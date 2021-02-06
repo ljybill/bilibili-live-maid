@@ -3,6 +3,7 @@ import config from 'config';
 import { ICtx } from '@/electron/types';
 import { BrowserWindow } from 'electron';
 import assert from 'assert';
+import { UPDATE_TTS_TOKEN } from '@/shared/constants';
 
 export async function createMainWindow(ctx: ICtx) {
   try {
@@ -27,6 +28,12 @@ export async function createMainWindow(ctx: ICtx) {
 
     if (config.get('isDev')) {
       mainWindow.webContents.openDevTools();
+    }
+
+    if (ctx.ttsToken) {
+      setTimeout(() => {
+        mainWindow.webContents.send(UPDATE_TTS_TOKEN, ctx.ttsToken);
+      }, 1000);
     }
   } catch (e) {
     // TODO: logger
