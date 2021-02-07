@@ -133,7 +133,7 @@ export default defineComponent({
 
         this.scrollBoxToBottom('main > .content');
         if (this.isBotNotice) {
-          this.speak(`欢迎 ${messageData.nickname} 进入直播间`);
+          this.speak(`${messageData.nickname} 说 ${messageData.content}`);
         }
       });
 

@@ -4,10 +4,15 @@ import assert from 'assert';
 import Events from 'events';
 import { onTTSAvailable } from '@/electron/middlewares/voice';
 import { getToken } from '@/electron/services/baiduYunService';
+import { listen1a2bMessage } from '@/electron/middlewares/game';
 import {
   DANMU_CONNECT, DANMU_DATA, DANMU_DISCONNECT, DANMU_ERROR,
 } from './constants';
-import { changeWindowPinStatus, createMainWindow } from './middlewares/windowController';
+import {
+  changeWindowPinStatus, close1a2bGame,
+  create1a2bGame,
+  createMainWindow,
+} from './middlewares/windowController';
 import { createBilibiliClient } from './middlewares/bilibiliClient';
 import {
   onConnect, onMessage, onDisConnect, onError,
@@ -225,7 +230,10 @@ myapp.use('app', 'ready', createMainWindow);
 myapp.use('app', 'ready', createBilibiliClient);
 myapp.use('custom', DANMU_CONNECT, onConnect);
 myapp.use('custom', DANMU_DATA, onMessage);
+myapp.use('custom', DANMU_DATA, listen1a2bMessage);
 myapp.use('custom', DANMU_ERROR, onError);
 myapp.use('custom', DANMU_DISCONNECT, onDisConnect);
 myapp.use('custom', 'change_window_pin', changeWindowPinStatus);
 myapp.use('custom', 'getTTSToken', onTTSAvailable);
+myapp.use('custom', 'start_game_1a2b', create1a2bGame);
+myapp.use('window', 'closed', close1a2bGame);

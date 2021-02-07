@@ -2,11 +2,10 @@ import { ICtx } from '@/electron/types';
 import {
   DANMU_CONNECT, DANMU_DATA, DANMU_DISCONNECT, DANMU_ERROR,
 } from '@/electron/constants';
-import config from 'config';
 import { createClient } from '../services/danmakuService';
 
 export function createBilibiliClient(ctx: ICtx) {
-  const danmakuClient = createClient(config.get('defaultRoomId'));
+  const danmakuClient = createClient(9167635);
   danmakuClient.connect();
   danmakuClient
     .on('open', () => {

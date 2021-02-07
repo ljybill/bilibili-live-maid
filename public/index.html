@@ -13,7 +13,11 @@
         Please enable it to continue.</strong>
 </noscript>
 <script>
-  window.ipcRenderer = require('electron').ipcRenderer;
+  try {
+    window.ipcRenderer = require('electron').ipcRenderer;
+  } catch (e) {
+    // console.error(e.toString());
+  }
 </script>
 <div id="app"></div>
 <!-- built files will be auto injected -->

@@ -1,5 +1,6 @@
 import { ICtx } from '@/electron/types';
 import assert from 'assert';
+import { MESSAGE_TYPE_DANMU } from '@/shared/constants';
 import MessageModel from '../models/MessageModel';
 
 let online = 0;
@@ -15,6 +16,12 @@ export function onMessage(ctx: ICtx, msg: any) {
     (ctx.windowsMap.get('main') as Electron.BrowserWindow)
       .webContents
       .send(message.type, message.toData());
+
+    if (message.type === MESSAGE_TYPE_DANMU && message.toData().content === '#1a2b') {
+      ctx.customEventEmitter.emit('start_game_1a2b', {
+        user: message.toData().nickname,
+      });
+    }
   } else if (msg.op === 'HEARTBEAT_REPLY') {
     // 心跳包
     if (online !== msg.online) {
