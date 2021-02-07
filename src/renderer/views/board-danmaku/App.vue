@@ -69,6 +69,10 @@ main
           @click="isPin = !isPin"
           class="icon-btn" :class="isPin ? 'icon-pin' : 'icon-pin-outline'"
         />
+        <i
+          @click="isBotNotice = !isBotNotice"
+          class="icon-btn" :class="isBotNotice ? 'icon-alarm' : 'icon-alarm-cancel'"
+        />
       </nav>
       <div class="content">
         <div v-for="item in msgList" :key="item.timeStamp">
@@ -99,6 +103,7 @@ main
 <script lang="ts">
 import { MESSAGE_TYPE_DANMU, MESSAGE_TYPE_JOIN, UPDATE_TTS_TOKEN } from '@/shared/constants';
 import { defineComponent } from 'vue';
+import btts from '@/renderer/services/btts';
 
 export default defineComponent({
   name: 'danmaku',
@@ -108,6 +113,7 @@ export default defineComponent({
       online: 0 as number,
       isShowNav: true as boolean,
       isPin: false as boolean,
+      isBotNotice: false as boolean,
       token: '' as string,
     };
   },
@@ -116,13 +122,19 @@ export default defineComponent({
       window.ipcRenderer.on(MESSAGE_TYPE_JOIN, (evt: any, messageData: any) => {
         this.msgList.push(messageData);
 
-        this.speak(`欢迎 ${messageData.nickname} 进入直播间`);
+        this.scrollBoxToBottom('main > .content');
+        if (this.isBotNotice) {
+          this.speak(`欢迎 ${messageData.nickname} 进入直播间`);
+        }
       });
 
       window.ipcRenderer.on(MESSAGE_TYPE_DANMU, (evt: any, messageData: any) => {
         this.msgList.push(messageData);
 
         this.scrollBoxToBottom('main > .content');
+        if (this.isBotNotice) {
+          this.speak(`欢迎 ${messageData.nickname} 进入直播间`);
+        }
       });
 
       window.ipcRenderer.on('online_changed', (evt: any, online: number) => {
@@ -154,17 +166,17 @@ export default defineComponent({
       if (!text) {
         return;
       }
-      window.btts({
+      btts({
         tex: text,
         tok: this.token,
-        cuid: 'www.ljybill.com',
+        cuid: 'hello_world',
         spd: 5,
         pit: 5,
         vol: 15,
         per: 4,
       }, {
         volume: 0.5,
-        autoDestory: true,
+        autoDestroy: true,
         timeout: 10000,
         hidden: true,
         autoplay: true,
